@@ -1,0 +1,724 @@
+PyCon APAC 2015 - Day 3 (June 7)
+
+This pad text is synchronized as you type, so that everyone viewing this page sees the same text.  This allows you to collaborate seamlessly on documents!
+
+Back to Day1: PyCon APAC 2015 Day 1 June 5
+Back to Day2: PyCon APAC 2015 Day 2 June 6
+官方開的Gitter:  https://gitter.im/pycontw/pyconapac2015
+
+[9:10][R0] Keynote (Steven G. Johnson)
+Crossing Language Barriers with julia, Scipy, and IPython
+Plenty to choose from: Python, Matlab / Octave, R, Scilab, ...
+
+
+Productivity vs Performance
+Matlab, R, Scipy...
+Performance tools failed.t
+
+Euro Scipy
+Symbolic Graph to C++ code
+Scipy ~70% static languages
+Python + C
+
+Just vectorize your code?
+vectorize rely on externel libraries
+someone has to write libraries
+
+Other works on enhancing dynamic languages
+JIT via LLVM
+Javascript on browsers achieve C speed
+PyPy, Numba, Cpython
+
+Julia
+Julia core developer 24+
+590+ Packages
+JuliaCon2015
+Easy to import Scipy compared to PyPy
+Lessen infrastructure problems
+Dynamically typed, metaprogramming, direct calling C/Python without wrappers, async, coroutines, unicode, parallelism
+70% Julia is in Julia
+Large built-in library: Regex, Linear Algebra ...etc
+
+Julia, Scientific
+Jupyter: Julia, Python, R, Haskell...
+Julia JIT: Compile different types for different parameter types 
+LLVM byte code @code_llvm, assembly @code_native
+Some special functions still in C/Fortran but sCome in pure Julia
+Same backend but faster than SciPy, Matlab special functions
+Techniques: Metaprogramming, code generating
+Pure Julia FFT 1/3 line of code
+Example: Vandamonde
+C++ long code for checking type to choose kernel, Generic(Template)
+function vander{T}(x::AbstractVector{T}, n=length(x))
+Numpy failed in small data size but result the same in big data size
+
+Julia, Speed and Design
+Aggressive specialization ... How does the compiler know types?
+Type Inference... Choice in Language design
+Ex: return value depend on types of arguments ... How about sqrt(-1) = i ?
+Python Integer Arithmetic(Auto BigInt) vs Julia int64, explicit BigInt needed
+Some Cryptographer may have this problem
+Why not add type declarations? Possible in Julia but superfluous for performance
+no longer type-generic
+only a small set of types are "blessed" by compiler
+annoying to write 
+Dynamic multiple dispatch
+object.method(arg1, arg2) vs method(object, arg1, arg2)
+methods(*), look at types of arguments first and choose implementation
+"hello" * "world" to "hello"+"world", dynamic overloading
+ccall, pycall (calling Cpython libpython)... how about calling in inner loops?
+@pyimport numpy + PyObject(Array)
+Function to python object
+Julia JIT -> C function pointer -> Join Cpython
+Joining Matplotlib
+
+Conclusions
+
+
+
+
+How Julia leverages Python and IPython to lessen the infrastructure problem of new languages
+
+Julia:
+dynamically language
+multiple dispatch
+metaprogramming
+Direct calling of C and Python functions
+Coroutines, asynchronous IO
+Designed for Unicode
+
+
+---------------- Break ----------------
+[10:00][R0] Python HDF5 Use Case (Liang Bo)
+Slides: http://blog.liang2.tw/2015Talk-HDF5-Use-Case/
+
+Hierarchical data format
+focus on fast
+stable
+bsd license
+
+Python : h5py and PyTables
+R : rhdf5 (on Bioconductor)
+Lua : HDF5 or Torch-hdf5
+Matlab : buit-in support
+
+Group
+Dataset
+Chunks
+Chunks help jumping over the HDF5 file faster
+A chunck can only be loadded fully (and cached)
+Chunck too large or small don't help creating large index overhead
+Compression and filter
+For cross-platform compatiblity use GZIP though sloer
+Filter further increase the efficiency of ...
+create_dataset(..,  compression='gzip2', shuffle=True)
+
+Datasets - metadata
+Tricky things - Strings
+ 
+Variable length?
+Variable-length Unicode? Tricky and not cross-platform
+>>> dt = h5py.special_dtype(vlen=str)
+>>> dt
+dtype((?))
+?Good things - Concurrency
+One connection for R/W and others for R only is a good paradigm
+HDF5 by default not thread-safe
+HDF5 compiled in parallel mode works seamlessly with ..
+
+How about X vs HDF5?
+Pickle the awesome
+Save but fail to load
+pickle.dump
+pickle.load
+
+Pickle vs HDF5
+Save a 8GB model in pickle?
+No-brainier so good
+
+Numpy save / load
+.npy, .npz are ...
+
+You said to save data? Database?
+Focus on io and storage
+ 
+They are designed for different purpose
+
+Database vs HDF5
+
+No index, search and join in HDF
+HDF does not do well in string handling
+
+http://www.pytables.org/
+
+HDF5 Uses case
+Speaker Daily - Pandas X HDF5
+Stop reading from CSV ...
+
+Large Numpy array X HDF5
+Original way
+Microsoft has lots of money
+Handled by HDF5
+lower memory cost (30GB -> 500MB)
+
+Deep learning x HDF5
+Parameter update tracking history
+RPi2 X HDF5
+Use RPi2 to do long term monitoring, save data with HDF5
+Temperature, moisture, daily pictures..., etc
+
+Recap
+HDF5 = Hierarchical Data Format 5
+...
+Robust and cross platform
+
+[10:00][R1]  Click Fraud Detection in the Mobile Advertising Using Python (James Hsu)
+What's Mobile Ad
+Types
+Banner
+Crazy Ad (插頁式)
+In Stream Video Ad
+Native Ad
+What is machine learning?
+Training Data
+Fetured Vectors
+Input to Machine Learning for training
+Model
+
+Ad Network Quality
+Example: google ad
+
+Invalid traffic
+如果開發商自行點擊廣告無效
+A publisher encouraging clicks on his ads
+Automatic script click it.
+
+Detecting invalid clicks is a process of data mining in Ad network traffic. 偵測無效點擊，是一連串的資料探勘。 Information != Answer 資訊不等於答案
+
+http://www.jasonsummers.org/wp-content/uploads/2012/12/Deep-Thought-11krlic.png
+
+Why to use python?
+Python without "import" is python?
+Can import a lot of models.
+Numpy
+Scipy
+Pandas
+statsmodels
+spyder
+theano
+matplotlib (visual information)
+Anaconda
+
+Case Study：App impressions, App clicks, App CTR 分析看起來都正常，但是分析了User impressions, user clicks, user CTR時會發現前述數據集中在少數特定使用者A＆B，僅user CTR出現user C，代表僅一有效使用者真正點擊廣告。
+Case Study: App Impressions
+Impressions : 廣告出現在App
+Case Study: App Clicks
+Case Study: App CTR(Click/Impressions)
+CTR：Click through rate
+Case Study: User Impressions
+Case Study: User Clicks
+
+在分析的時候，你無法知道你看到了什麼，只能用各種工具去分析
+
+example: 搜尋：總統大選。
+ * 條件：兩台不同電腦，但系統一樣。使用Google搜尋
+結果：他太太的搜尋會出現希拉蕊，但他的搜尋結果沒有。
+這應該是因為有登入帳號的原因吧!?不是電腦不同的原因?
+comment:應該是，但我想他想表達的是google搜尋的結果會因為不同的人而有不同的結果，並不是完全一樣
+Facebook 也會依據你常看那些東西，餵你文章還有廣告。所以看一個人的Facebook就知道他在幹什麼了XD
+
+
+強，怎麼抓圖貼圖的？
+感謝
+對不起，不小心弄壞上面連結請幫回復
+http://www.quora.com/What-is-substantive-expertise-in-data-science
+No mind
+
+
+[10:00][R2] Sentiment Analysis by NLTK (Wei-Ting Kuo)
+slide: http://www.slideshare.net/waitingkuo0527/sentiment-analysisbynltk
+Analyze Amazon review, Twitter reply...
+Analyze whether a sentence is positive or negative
+"The first chapter is good,  but the rest is terrible" -> how to know whether it's negative?
+ easiest: sentiment dictionary: like=1 good=2 terrible=-3 bad=-2 ....etc
+ "The first chapter is good,  but the rest is terrible" = -3 + 2 = -1
+
+AFINN-111: the dictionary that contains emotion words and it's score
+from -5 (the worst) to 5 (the best)
+In python: split each line in the dictionary file from AFINN-111 by tabs and convert it to a dictionary
+AFINN-111: http://www2.imm.dtu.dk/pubdb/views/publication_details.php?id=6010
+Deal with punctuation
+
+NLTK
+Natural Language ToolKit
+Works with Python3!
+
+use word_tokenize in nltk.tokenize to tokenize words
+
+Still lose some information:
+Nice book! Though it is lack of advanced topic. It's still a good book for beginners.
+- only have the total score of postive 3, missing that the word "lack" is a negative one
+
+Analyze the article sentence by sentence:
+use sent_tokenline() in nltk.tokenize to separate the sentences.
+compute the score of each sentence
+Sometimes the whole sentence is negative, but it does mention some positive points: count pos & neg separately. e.g. use a [pos, neg] tuple
+
+When you see new words, how do you deal with them?
+Machine Learning
+Fit the data into a model
+
+NLTK with machine learning
+the model python dictionary using looks like this:
+[{ 'a'; True, 'good', True, ..., } pos]
+please reference the slides: http://www.slideshare.net/waitingkuo0527/sentiment-analysisbynltk
+Use NaiveBayesClassifier from nltk.classify to train the model
+http://www.cs.cornell.edu/people/pabo/movie-review-data/  : a nice review data source in which reviews are labeled positive/negative by human.
+
+the data have to be separated into two part: training data and testing data. Use the training data to train, use the testing data to verify.
+
+compute the accuracy:
+from nltk.classify.util import accuracy 
+accuracy = number of correct/total
+
+How to enhance:
+use the most frequent 1k words
+different model (SVC, linear regression...)
+read papers! e.g. deep learning (not easy and requires computation power)             
+
+Q&A:
+Use feature extraction (?)
+Q: How to distinguish the group of fan by the movie they like? 
+A: Train different models for different movies (?)
+A little idea: pre-test the users, use the pre-test result to normalize the outcome of the coment
+Q: What if in the case: in "not like" the meaning of "like" is inverted?
+A: Include something like "not" into the dictionary (?? not sure) Should consider the context.
+
+[10:00][R4] IBM Workshop
+
+IBM 工商服務中
+
+[10:30][R4] Oursky Workshop
+
+Oursky Technical present
+C10k problem
+thread based handling of large numbers of multiple connection is not practical
+Use event loop
+Event loop
+single thread execution, handle 
+Python's asyncio
+PEP 3153
+Standard library in Python 3.4 (asyncio on PyPi for Python 3.3)
+Comparison with existing frameworks
+gevent
+mock all existing network io calls
+being implicit
+less control than asyncio
+Coroutine
+Like generator
+Execution breaks in half way, no callback hells
+
+Asynciso Demo!
+
+repo: https://github.com/oursky/pycon2015
+
+libs:
+asyncio on Python 3.3
+websockets
+
+decorate coroutine function with @asyncio.coroutine
+use "yield from" for async operation
+catssssssss
+aiohttp: https://github.com/KeepSafe/aiohttp
+
+工商服務: http://jobs.oursky.com/tw/
+
+---------------- Break ----------------
+
+[11:10][R0]  Play Data, Play Ball! (Summit Suen)
+
+slides: http://slides.com/summitsuen/playballpycon2015/fullscreen
+
+Baseball is kind of the easiest one to analyze:
+Discrete v.s. Continuous 
+ 所以棒球到底是哪一種？XD
+discrete, I think.
+yup, more like discrete
+Records v.s. Logs
+sabermetrics (賽博計量學)
+https://www.edx.org/course/sabermetrics-101-introduction-baseball-bux-sabr101x-0
+History:
+Henry Chadwick
+Hugh Fullerton: first one using scientific approach
+Earnshaw Cook: systematic, mathematical
+...
+Bill James: Built formula. Use aggregated metrics
+Billy Beane: Movie: Money ball. 
+
+Use historical data: Lahman database: http://seanlahman.com/ : 
+Statistics of baseball teams
+Salary info: salary = performance ? XD (see charts in the slides)
+
+Realtime data: MLBAM http://www.mlbam.com/
+XML, JSON(recently) format
+contained events: pitch, result, speed, ....
+https://github.com/mattdennewitz/mlbam-utils
+
+Use R (XD): openWAR
+來 Taiwan R User Group 玩吧XD
+for sports without data: parse it 
+
+[11:10][R1] 工程師沒告訴設計師的事 / Happy Together: Designer and Programmer (TsungWei Hu)
+
+https://docs.google.com/presentation/d/1TRY3t6htf214xT1jbwyRwngVOw0O8YAYnNZM70zvDsw/edit#slide=id.p
+Pitfalls in Waterfall
+改 Design 又要改 template，工程師 and 色劑師的雙師困境
+永遠會有 last mins change。Designer 會作必要的修改，工程師就會需要改 template
+Diazo技術
+Theme: Designer的result
+Content: Programmer的result
+Rule: 中介控制 Designer 以及 Programmer 的 result.
+
+Diazo makes Happy together happen！ 
+http://docs.diazo.org/en/latest/
+Rule's Basic Knowledge
+CSS Selector (Basic)
+Xpath Selector (Advanced)
+XSLT (Guru)
+
+How to Identify a placeholder?
+
+Rule's Basic Syntax
+<theme/> / <notheme/>
+<replace>
+<before> / <after>
+<drop> / <strip>
+<merge> / <copy>
+
+如果沒有用 CSS 定位，那就是用 xpath 進行定位。
+Live Demo
+Replace Logo / Title
+Replace Menu
+Replace Sidebar
+Replace Article Listing
+Drop Redundant elements
+
+Web Engine → Diazo Proxy → html, css, js
+
+Reference
+http://docs.diazo.org/en/latest/
+
+
+[11:10][R2] The Implementation of Rubik's Cube Formula in PyCuber (Adrian Liaw)
+
+Basic Notations
+R(right)
+L(left)
+U(up)
+D(down)
+B(back)
+F(front)
+github: https://github.com/adrianliaw/PyCuber
+
+[11:10][R4] IBM Workshop
+
+---------------- Break ----------------
+
+[11:50][R0] Kernel-mapper (Tool to simplify the use of PyOpenCL) (Kilik Kuo)
+silde: https://docs.google.com/presentation/d/1fJFya6ie-nc8hg0zAd4fIN7g8RZsw_jcf-ZWz4C5364/
+
+What is openCL
+Open computing language
+a frameworks for heterogeneous computing
+heterogeneous: all units that has the computational power can be used. e.g. GPU, CPU ...
+openMP: convert for loops to parallel computation
+openCL architecture:
+host: cpu + system memory
+compute device
+memory hierarchy: 
+global, constant, local, private
+
+
+Platform
+host
+device
+program
+command queue
+context
+kernel
+
+casino metaphor:
+dealer: host
+player: device
+player's hand: command queue 
+card: kernel
+poker table: context(?) connects the dealer and player
+paltform: different regions in the casino
+deck of card: program
+
+kernel (function): where the logic is implemented. Divide the problems. 
+example: replace the array index in each iteration in a loop by a resource id. Run them separately.
+
+PyOpenCL: a wrapper to simplify the usage of GPU
+https://github.com/pyopencl/pyopencl
+pros:
+no resource management
+all APIs wrapped
+easy to debug
+install numpy, pyopencl
+
+kernel-mapper:
+programmers who knows C and the tricks implement the empty kernel code. the others implement the python code.
+
+
+[11:50][R1] Python 與電子設計自動化：用愛與堅持實現專業 (Ko-Lung Yuan)
+
+Book: It's django 用 Python 迅速 xx Web xxx
+github username: dokelung 
+
+EDA 電子設計自動化
+http://zh.wikipedia.org/wiki/%E9%9B%BB%E5%AD%90%E8%A8%AD%E8%A8%88%E8%87%AA%E5%8B%95%E5%8C%96
+
+Python 在 EDA 裡是很少看到的。EDA裡面是C++的天下。
+BOOK: 深入淺出Python，自從看了這本之後.....
+http://www.books.com.tw/products/0010526346
+
+http://www.books.com.tw/img/001/052/63/0010526346.jpg
+==> 自從遇到 Python 後，就儘可能的逃避 C++。
+
+Script King
+http://github.com/dokelung/script-king
+
+create multi-file with script king.
+
+msat
+
+$ pip install msat
+
+Subset-Sum Problem
+
+各種演算法實作。
+
+
+minickt
+ 可以用pip安裝
+$ pip install minickt
+
+[11:50][R2] Gandi CLI (Thomas Kuiper)
+A command line tool for gandi.net
+gandi.net 工商服務時間
+
+[11:50][R4] IBM Workshop
+
+---------------- Lunch Break ----------------
+[13:30][R0] Keynote (Travis Oliphant)
+PyData: Python Data Science
+
+NumFOCUS  http://numfocus.org/
+
+Storage distruption 
+ETL Disruption: hive, hbase ,...
+
+Hype circle of big data
+
+
+some truth about big data
+Data aging
+SAS 45
+SPSS 45
+INFORMATICA 20
+SAP 23-40
+R 20
+numpy 8
+Python 22
+
+The fundamental physics
+Moving/copying data (and managing copies) is more expensive than computation.
+
+http://datagravity.org/2012/06/26/a-formula-for-data-gravity/
+
+Anaconda: https://store.continuum.io/cshop/anaconda/
+Numba: https://github.com/numba/numba
+Bokeh: http://bokeh.pydata.org/en/latest/
+Blaze: https://github.com/ContinuumIO/blaze
+dask: https://github.com/ContinuumIO/dask
+Wakari: https://wakari.i++++++++++++++++++++++++++o/
+
+data pain
+hundreds of  data formats
+basic programs expects all data to fit in memory
+data analysis pipelines constantly changing from one form to another
+sharing analysis contains significant overhead on configure system
+parallelizing analysis requires expert in particular distributed computing stack
+
+Numba
+Numba turns Python into compiled language
+
+Bokeh: http://bokeh.pydata.org/en/latest/
+Interactive visualization
+Novel graphics
+Streaming,Dynamic,Large data
+
+
+
+---------------- Break ----------------
+[14:20][R0] Sphinx autodoc: automated API documentation (Takayuki Shimizukawa)
+
+http://www.slideshare.net/shimizukawa/sphinx-autodoc-automated-api-documentation-pyconapac2015
+
+Do you know docstring?
+
+Have you write API doc in docstring?
+
+What is the reason you do not write docstring?
+...
+
+Sphinx based on docutils library.
+
+sphinx.ext.autodoc
+sphinx.ext.autosummary
+sphinx.ext.doctest
+sphinx.ext.coverage
+
+take care, sphinx autodoc will execute your code at ... level.
+danger code
+  import os
+
+  def delete_world():
+      os.system('rm -Rf /')
+
+  delete_world()     # will be executed when `make html`
+safer code
+  if __name__ == '__main__':
+      delete_world()      # won't be executed when `make html`
+
+doctest builder
+`make doctest`
+
+List API automatically
+autosummary extension
+`sphinx.ext.autosummary`
+
+coverage extension
+list undocument python object
+$ make coverage # note: this command is always return zero
+
+sphinxcontrib-httpdomain 3rd party ext
+
+[14:20][R1] Machine learning in Finance using Python (Eric Tham)
+Slides:
+
+http://www.slideshare.net/erictham/machine-learning-in-finance-using-python
+
+Machine Learning in finance
+Sentiment analysis : (Behavoiural finance)
+Credit analytics
+Financial forecasting
+Portfolio allocation
+
+Libraries:
+Sci-kit learning
+Theano
+Stats Model
+
+General forecasting (Machine Learning)
+3 steps to any forecasting: (or machine learning)
+Preprocess and transform data:
+On both output and input: it's the key, the art, and a science
+In finance: these could be economic variables, sentiment data, price data
+Model:
+CART, neural network, logistic regression, ...
+time period
+  3.Assess and backtest:
+statical output
+in sameple and out of sample
+go back to 1 if necessary
+
+Financial forecasting model in python
+http://pandas.pydata.org/pandas-docs/stable/remote_data.html
+Sourcing data retrieves data from sources (e.g.  Yahoo finance)
+Applying technical transformation on data
+momentum indicator e.g. KDJ
+overbought/oversold indicator e.g. RSI
+Training- applies different model parameters (possibly 1000s combinations ) to assess best results
+logistic regression
+有投影片大家都不寫了 XD
+XD
+開始寫CODE
+XDD
+投影片註解寫 go to github 是指哪個repo?
+https://github.com/erictham  （？
+我看不到相關的repo XD
+https://github.com/erictham/node-finance   <<這個呢?
+.js XD 或許他看的是別人的repo也不一定QQ
+Maybe..
+黑天鵝效應
+http://www.moneydj.com/kmdj/wiki/wikiviewer.aspx?keyid=43c13f1c-68b9-45e8-b4e1-ed6a255cb6fe
+
+
+[14:20][R2] Building Static Blogs using Pelican (Quazi Nafiul Islam)
+
+post thoughts, get feedbacks.
+http://blog.ionelmc.ro/2015/02/09/understanding-python-metaclasses/
+
+What does the static blog means?
+Normal Blog :
+Database <--> server <-->  Broswer
+
+Static Blog
+Server <->  server
+
+It,s All About Generation
+
+Why Pelican?
+http://docs.getpelican.com/en/latest/
+Easy to build plugins
+all written in Python (Leverage the full power of Python)
+90+ themes
+100+ plugins
+Any formats
+restructuredText
+練習 restructuredText 的好時機
+IPython Notebook
+Markdown is far better supported through plugins
+
+How does it work?
+
+Articles/pages -> content object
+content object are then rendered using your theme(using jinja templates)
+
+My Choice
+reStructured Text 
+Easy to Extent(but has ussues)
+Rails exceptions on failed compilation
+Markdown is far better supported through plugins
+Livereload
+i can see change in my blog post in real time
+develop server.sh sucks
+Needs a bit of work and a plugin in your browser to work
+Github pages
+Why not
+Ghp-import package
+pip install ghp-import
+ghp-import output
+git push git@github.com<username>/<username>.github.io.git gh-pages:master
+https://docs.getpelican.com/en/latest/tips.html@publishing-to-github
+
+Making themes
+http://docs.getpelican.com/en/latest/themes.html
+
+Online Demo: http://nafiulis.me/pycon-apac-2015.html
+
+---------------- Break ----------------
+
+[15:10] Bingo and Lucky Draw 
+
+---------------- Break ----------------
+
+[15:50] Closing 
+
+Pycon APAC 2016 in Korea
+
+---------------- PyCon APAC 2015 End ----------------
+
+

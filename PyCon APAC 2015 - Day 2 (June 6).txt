@@ -1,0 +1,809 @@
+﻿PyCon APAC 2015 - Day 2 (June 6)
+
+This pad text is synchronized as you type, so that  everyone viewing this page sees the same text.  This allows you to  collaborate seamlessly on documents!
+
+Back to Day1: PyCon APAC 2015 Day 1 June 5
+官方開的Gitter:  https://gitter.im/pycontw/pyconapac2015
+
+
+[09:10][R0] Keynote Robert Bradshaw
+Static typing in Python
+
+Cython: http://cython.org/
+able to manually manage memo
+Python with optional static typing.
+ cdef int x
+ cdef double a, b, c
+ cdef int* xs
+
+Types are tools that may be leveraged by developer to achieve specific objectives
+Performance
+write with c code
+
+IDE Tools: Emacs, Eclipse, ATOM, PyCharm
+check typos, who calls this?
+
+Large Projects(Lines of Python)
+google > sage > django (400K) > cython (<100K) > ipython > personal projects
+
+Brief Theory of Gradual Typing
+Static typing < Gradual Typing < Dynamic Typing
+(but python 應該是 duck typing吧，不是dynamic typing?)
+兩個講的是不同的事吧
+Python 是 dynamic typing，也是 duck typing，兩個是不同的議題
+
+Brief Theory of Gradual Typing
+Magic Any Type
+Non transitive consistency relation
+∀T : Any ~ T
+
+PEP 483, 484
+New `typing.py` module
+Any, Union, Iterable, TypeVar
+Types are still hints, external validation
+Stub files, overloads
+Current focus on type safety
+Partial step forward for too
+
+Side Inputs
+```python
+result = input | map('add_suffix', lambda x,s: x+s, AsSingleton(suffix))
+```
+這裏應該沒支援 MarkDown 語法
+
+Side output
+
+(Pre)Join
+
+What's the benefit of Google Cloud Dataflow API?
+Composite of PTransforms
+
+Deferred Errors
+construct
+optimize
+execute -- then got `TypeError`
+
+Boundary Errors
+Boundary interactions less likely to be Unit Tested.
+
+Non-trivial Performance Implications
+PCollection schema allows efficient data encoding
+
+Static typing is good.
+Dynamic typing is good ... also.
+
+Let's' enjoy the benefits of static typing in Python sometimes.
+
+Q&A:
+Q: code example
+A: pep-0484 https://www.python.org/dev/peps/pep-0484/
+
+
+[10:00][R0] 利用 IPython Notebook 來互動簡報與教學
+IPython -> Jupyter
+https://jupyter.org/
+
+現代工具
+Jupyter Notebook
+R Markdown/shiny
+HTML5 Presentation
+
+RISE/livereveal
+https://github.com/damianavila/RISE
+
+優點
+Jupyter Notebook + reveal.js
+人類適合用二維的方式記憶 (1D太簡單，3D太難，2D剛剛好)
+持續發展中
+
+缺點
+Jupyter Notebook + Reveal.js
+持續發展中
+版本一直變
+CSS本身問題多多
+一邊做投影片 一邊送 Pull request
+
+這是電腦，不是多媒體放映機
+
+Question: 誰喝水誰養斑馬？
+例子：愛因斯坦謎: 誰在喝水 誰在養斑馬
+http://www.vedfolnir.com/einstein-mystery-who-drink-and-takes-care-of-zebra-1802.html
+
+資料導向
+簡報上的互動性：可從網路上抓資料，也可以及時算資料出來（報表）
+思想上的互動性
+小女孩撿石頭的故事
+演算法
+金鑰交換  Diffie-Hellman
+
+Brython：用 Python 寫 Javascript 的東西。
+IPython呼叫Javascript 
+from IPython.display import Javascript
+Javascript("window.some_variable=%d" % 2015)
+Javascript 呼叫IPython
+%%javascirpt
+window.IPY = IPython.notebook.kernel
+IPY.execute("some_variable='PyCon APAC " + some_variable )
+
+如果今天網路掛了，這個 Session 應該就爆了！簡報這麼吃網路好嗎？ XD
+網路是基本人權啊！！
+
+Reference
+https://jupyter.org/
+http://ipython.org/
+http://bokeh.pydata.org/en/latest/index.html#
+ slides:http://nbviewer.ipython.org/url/b81.org/s/PyConAPAC2015JupyterRISE.ipynb
+
+[10:00][R1] Global Interpreter Lock: Episode I - Break the Seal
+Go to github search gil1
+
+Global interpreter lock: 
+giant lock
+GIL in CPython protects:
+interpreter state, thread state, ...
+reference count
+"a guarantee"
+some CPython features and extensions 
+Other implementations
+fine-grained lock
+lock-free
+演算法不需要lock or 操作是atomic的
+
+這是一個男子漢約定的概念。
+GIL over Multi-processor
+希望4個Cpu都可以被CPython 同時利用
+「男子漢的約定豈可任意改變?」
+
+## Brainless Solution
+Examples
+multiprocessing, pp, pyCSP
+ multiprocessing: 內附的standard lib
+ 使用process pool
+ non-deterministic: the same input, different output
+ 
+ mutliprocessing 內部是call fork()
+ 用un-named pipe 丟 arguments
+ 
+ IPC 成本昂貴，用在 multiprocessing內
+ GIL battle [17] (兩個thread同時搶一個GIL) 的overhead
+ 
+Parallel Python:http://www.parallelpython.com/
+pp remote node 
+ppserver 只是用來溝通，實際做事的是 ppserver 底下的 worker
+
+Release the GIL
+Especially suitable for processor-bound tasks
+Examples:
+ctypes : 推薦, (base on Python/c extension)
+Python / C extension (來去自如)
+linking to the busy.so extension
+When it comes to C thread vs Python thread battle, C thread always win.
+Cython (懦夫救星)
+
+  http://img181.poco.cn/mypoco/myphoto/20110128/14/56335301201101281419442835227424534_000.jpg
+Pyrex
+
+Cooperative Multitasking
+Only applicable to IO-bound tasks
+Single process, single thread
+no other thread, no GIL battle
+Executing the code when exactly needed
+Examples:
+generator (太 geek，容易寫錯): e.g. tornado framework has more friendly interface
+pyev (libev)
+gevent (libev + greenlet)
+
+pyev watcher structure要自己顧好
+
+gevent
+
+Interpreter as an Instance
+Rough idea 
+在一個process內包含多個interpreter
+
+Conclusion
+How to live along with GIL well?
+Multi-process
+Release the  GIL
+....
+
+Reply: https://github.com/tornadoweb/tornado
+[10:00][R2] Liquid crystal device simulation with Python SciPy
+
+https://github.com/xingularity/OpenLCDFDM
+Birefringence: 兩種折射率Two refractive index(n0 and ne)
+
+CF alignment layer
+/
+/
+/ Liquid Crystal 
+/
+/
+TFT alignment layer
+
+Solve Euler-Lagrange equation iteratively.
+目的是求極限值, 使用Pseudo-dynamic process,但是沒有物理上實際意義
+
+[11:10][R0] Building a Scalable Python gRPC Service using Kubernetes 
+gRPC concepts
+Remote Procedure Call
+
+support HTTP / 2
+is binary, no telnet anymore.
+fully multiplexed 
+Less connections, which is a feature from HTTP/2 (One connetction sends many requests)
+uses header compression to reduce overhead
+allow servers to "push" responses
+
+Protocol Buffers
+a way to serialize structured data
+binary
+can be parsed quickly
+are flexible (easy to add new fields, supports addons)
+supports code generation
+
+gRPC & Python
+Github -  https://github.com/grpc/grpc
+Hello World Program - https://github.com/grpc/grpc-common/tree/master/python/helloworld
+
+Containers & Kubernetes
+Shared Machines
+Virtual Machine
+Some isolation
+Expensive and inefficient
+
+Http protocol Debug tools 
+wireshark
+request header
+
+
+Kubernetes
+Container orchestrator
+Runs Docker containers
+Resize "pods" 
+front-end redirect 
+Supports multiple cloud and bare-metal environments
+Open source, written in Go
+
+Kubernetes
+https://github.com/googlecloudplatform/kubernetes
+http://kubernetes.io/
+kubectl - https://cloud.google.com/container-engine/docs/kubectl/
+
+
+
+[11:10][R1] Python & LLVM
+
+Agenda TOC
+Python bindings for LLVM
+llvmpy
+llvmlite
+
+Introduce 
+Compiler infrastructure 
+modular design
+written in c++
+LLVM IR (Intermedia Represetation)
+Optimization 
+Batter Diagnostic
+Tooling
+
+GCC vs LLVM
+GPLv3 vs UIUC,MIT 
+不依賴 GCC ，但Linker => lld/mclinker (LLVM)
+libstdc++ (GCC) vs. libc++ (LLVM)
+libgccjit(GCC) vs. libLLVMMCJ (LLVM)
+
+overview 
+http://lvm.org/release/3.1/docs/ReleaseNotes.html
+http://llvm.org/docs/doxygen/html/group__LLVMC.html
+LLVM C API
+llvmpy 
+http://www.llvmpy.org
+llvmpy is a Python wrapper around the llvm C++ library which allows simple access to compiler tools.
+The author
+www.mdevang.org
+llvmpy is depreacated, use llvmlite instead
+3）llvmlite
+  https://github.com/numba/llvmlite
+  
+ Alight llvm python binding for  write jit compilers
+  
+  livmlite.pydata.org
+  
+  Diagram of Compilation Piepline:
+Python bytecode =>DataFlow/ControlFlow Graph=> Numba IR => Typed Numba IR => LLVM IR
+  
+http://eli.thegreenplace.net/2015/building-and-using-llvmlite-a-basic-example
+http:// eli.thegreenplace.net/2015/bu  ???  
+
+HPC (heterogeneous Parallel Computing)
+LLVM Compiler for CUDA
+
+Anaconda
+https://developer.nvida.com/how-to-cuda-python 
+  LLDB : debugger of LLVM 相容GDB
+  
+LLDB
+http://lldb.llvm.org
+Http://lldb.llvm.org/architecture/index.html
+http://llvm.org/devmtg/2015-02/slides/abid-lldb.pdf
+
+$ lldb
+(lldb) scipt 
+>>> 
+ 
+ Lldb-capstone
+ Casptone
+Next generation disassembly framework
+Based on the MC (machine code) layer
+support Python, cython 
+
+  ## slide
+  http://www.slideshare.net/eurobsdcon/euro-bsd-con-2014-lldb
+  LLDB有embedded Python interpreter
+  
+## lldb-capstone
+github.com/upbit/lldb-capstone-arm  
+#python binding
+hrrp://capstone-engine.org/llang_pything.html 
+cython-based  binding for better perfomance 
+
+Medusa 
+github.com/wisk/medusa
+based on Boost C++
+  
+  build 
+  www.boost.org
+  www.ogdf.net/doku.php
+  
+GCC 的 Logo 好可愛啊！
+講者說話速度好快
+這對聽不慣這個口腔的人而言挺吃力的。
+內容太多，所以才要說快點吧！
+好險坐第一排，後排的人應該看不太到字 …
+說的是中文，理解上像外文…
+becos 他們英文老師是俄國人教的 。。。 我老是覺得L 及R  發音都怪怪的
+這個session很硬...
+Can't understand every words.....
+結果都在 hackpad 上聊開了！ XD
+XD, 我都不知他可時說中文，何時是英文了
+我在這，媽。
+講著懂蠻多的，建議跟他聊聊
+我待過大陸2年時間，聽起來都吃力了 
+看到一堆倉頡跟注音拆碼 …，有人打嘸蝦米嗎？ XD
+嘸蝦米++ xd
+嘸蝦米+1
+嘸蝦米+1
+lol
+ 請問有IRC的網址嗎？ (真的聊開了XD)
+太 geek 了
+所以要來開 Gitter 嗎？ XD
+ 還沒有是不是 我以為有IRC
+聊成這樣，看來沒幾個人在認真聽啊…orz
+WHO has example URL  ?
+這邊的 IRC 上明明就沒人啊！請看 #pycontw   ... XDD
+問題是就算開了 irc，手上沒機器掛，一下就斷線了 Orz
+Gitter might be better than IRC at this kind of network condition. XD
+ 所以這場演講即將摧生一個gitter? #功不可沒
+用拍照，打太慢
+沒有 pycon 的 group，就用自己的 account 開了。XD https://gitter.im/chusiang/pyconapac2015
+ 要不要貼到頁首 高調XD
+這樣子好嗎？在下很低調的 … XDD
+去吧XD
+#python.tw @freenode 都沒人，歡迎去坐
+發到 Twitter 上去了 XD
+第五排開看不太到他的字ＱＡＱ
+整三排放棄看圖片惹...
+在下坐第一排都看不到字了 …
+等slide，在看細節
+還是請工作人員開？
+如果有工作人員要開也好！那到時會把這邊關掉。
+第五排 +1，投影片的文字實在不大
+https://gitter.im/pycontw/pyconapac2015
+官方開的
+
+
+Reference
+http://zh.wikipedia.org/wiki/LLVM
+llvm.org
+
+
+[11:10][R2] Data Analysis in Wearable Technologies
+
+Common functions
+Activity monitor
+Pedometer (計步器)
+Heart rate monitor
+
+What can wearables do
+establish motivation
+self-knowledge
+continuous recording
+Long-term data
+(Most users stop using their devices within 6 month)
+Data accessibility
+apps and web services
+sometimes there is an API: Fitbit, Jawbone
+sometimes there is no API
+
+Fitbit API
+python api for user
+
+Jawbone
+Provide python wrapper
+
+Activity monitor
+Pedometer (計步器)
+Accelerometer (用壓電材料感測不同壓力去量測加速度)
+Gyroscope
+
+Wrist v.s Waist accelermeter
+Wrist accelermeter
+cannot measure steps accurately
+sometimes misrecognise 
+Waist
+more accurate
+less convenient to interact with
+
+Distinguish Different physical activities
+Devices: wrist or ankle-worn
+Use SVM
+4 categories: ambulation, sedentary, cycling, other
+95% accuracy
+
+Hear Rate Monitor
+Electrocardiogram(ECG)
+Detect the tiny electrical change on the skin
+Photoplethysmogram(PPG)
+Photo > light
+Need to be stabilized by clip on fingertip to make sure position and pressure are consistent
+only average heart reate
+ EKG
+standard
+accurate HR
+
+Heart rate variability(HRV)
+Reveals the state of autonomic nerve system(ANS)
+A normal ANS can up or down regulate sympathetic and parasympathetic tone depending on the needs of the body
+Related to cardiovascular mortality
+
+Fetal Monitor
+Use ECG
+Detect baby heart rate and uterus contraction
+High variety on baby heart rate is good(reactive)
+
+
+Frequency Domain Measures
+- Total power in ms
+Ultra low frequency
+Very low frequency
+Low frequency
+High frequency
+LF/HF ratio
+
+pyHRV - used to generate above mentioned metrics  https://sites.google.com/site/pyhrvlib/pyhrv
+
+Decreased HRV
+Over-training 
+sleep quality
+Sleep cycle
+Hypnogram
+
+Polysomnography (Detect sleeping disorder)
+brain waves
+heart rate
+oxygen level
+breathing rate
+eye and leg movement
+
+Blood Pressure
+Hilbert-Huang Transformation
+ http://zh.wikipedia.org/wiki/%E5%B8%8C%E7%88%BE%E4%BC%AF%E7%89%B9-%E9%BB%83%E8%BD%89%E6%8F%9B
+Case Study: Blood pressure lower around May - indicate patient sensitive to temperature change
+
+Recap
+Data Analysis in Wearable Tech
+Activity monitor
+HR monitor
+BP monitor
+
+[11:50][R0] Easy contributable internationalization process with Sphinx
+http://sphinx-doc.org/
+Comparing Docutils and sphinx
+Single page vs Multiple pages
+
+```shell
+pip install sphinx
+pip install sphinx-intl
+pip intsall transifex-client==0.8
+```
+docs/conf.py:
+language = 'zh_tw'
+
+i18n
+Translation is what i want to do!
+
+Translation flow:
+ reST-> sphinx -> pot
+ pot -> translator -> po
+pot -> sphinx-intl -> po
+ po+reST -> sphinx -> html
+
+sphinx-intl can get the difference when documents change
+
+Be parallel by using Transifex
+
+```shell
+sphinx-intl create-transifexrc
+sphinx-intl create-txconfig
+make gettext
+sphinx-intl -p _build/gettext update-txconfig-resources
+tx push -s
+tx pull -l zh_tw
+make html SPHINXOPTS="-D language=zh_tw"
+```
+
+GitHub + drone.io + S3
+
+Tip: drone.io limits 15 misn for a build
+Sol: install from wheel package may help you
+time costs:
+install django from source: 15secs
+install django from package: 4secs
+
+Trick: prepareing drone.io project
+drone.io only create project for the repository you have admin permission
+Sol: create empty repository first
+
+[11:50][R1] Python 讓你的眼睛聽得見
+
+CKLab
+
+
+視覺很重要：
+McGurK 效應 VIDEO PLAYING
+Ba v.s. Va
+有聲音沒影像：背景聲音影響辨識
+沒聲音有影像：
+
+英文語音資料庫：
+AVLetter
+CUAVE
+OuluVS
+IBMSR
+IBMIH
+
+中文語音資料庫:
+尚無
+
+資料庫建立：
+受測者 40 名 (23男, 17女)
+數字 0-10、5 個隨機數字為一組, 每組唸三遍(兩兩相臨的數字涵蓋所有的組合)
+分二階段：reading、speaking
+
+影像辨識：
+OpenCV
+擷取臉部位置再找出嘴的位置
+速度較快
+由整張影像中找到嘴巴位置
+速度較慢
+haar cascades 
+http://alereimondo.no-ip.org/OpenCV/34
+ 這個網站好難找 XD
+XD
+
+
+唇語辨識：
+影像切成 4 個 batch (音節)    ← 網格
+透過計算肌肉變化量，辨識音節
+靠人力作判斷程式辨識結果是否正確
+
+
+Q & A1
+[R1] 綠背景 + 黑條紋？ 黑條紋是水平線用來校正用的。
+
+Refernece：
+http://scikit-learn.org/stable/
+
+
+用 VLC 播聲音可以大聲一點。
+進擊的巨人LoL
+https://gitter.im/pycontw/pyconapac2015 gitter is coming.
+
+[11:50][R2] Information extraction with Python
+Application
+Word segmentation
+input "new york", "museum" --> "New your museum"
+QA system
+e.g. Q: which country is Athens in? A: Greece
+How? query to DB
+Parse a query into SQL(using nltk parser https://pypi.python.org/pypi/nltk https://github.com/nltk/nltk )
+How to extract entity?
+
+Conditional Random Fields (條件隨機場)
+find part of speech to predict
+POS = Part Of Speech
+Open Source Tools
+CRF++
+CRFSuite
+
+use python binding to CRFSuite: python-CRFsuite
+Step by step guide:
+https://github.com/tpeng/python-crfsuite/blob/master/examples/CoNLL%202002.ipynb
+
+http://brat.nlplab.org/
+brat rapid annotation tool to annotate your own data
+online trial: http://weaver.nlplab.org/~brat/demo/latest/#/editable/CoNLL-ST_2002/esp/esp.train-doc-100
+
+Feature Generating
+generate a set of features for current/prev/next node, e.g. isDigit, isUpperCase, etc
+為何選西班牙語做corpus範例？
+應該是直接用了上面提到的ipython notebook裡面的例子
+Training Model
+Make Predictions
+
+What about Chinese?
+Example corpus 人民日報
+For simple example, search for keyword 命名實體識別 條件隨機場
+
+Q & A
+先偵測人名tag，再偵測地方tag`，再偵測組織tag
+
+[13:30][R0] Keynote Arnaud Bergeron
+Agenda:
+What is Theano?
+How Does it Work?
+How Fast Is It?
+
+Theano:
+https://github.com/Theano/Theano
+http://deeplearning.net/software/theano/
+Theano is a Python library that allows you to define, optimize, and evaluate mathematical expressions involving multi-dimensional arrays efficiently.
+
+Goals:
+Integration with Numpy
+Transparent use of the GPU
+Efficient symbolic differentiation
+Speed and stability optimization
+
+Machine learning libraries comparison:
+http://fastml.com/torch-vs-theano/
+
+[15:10][R2] Marsface Project
+Marface detector - detecting face-like Mars images 
+Download images from JPL using python
+face-like images are  optical illusion http://en.wikipedia.org/wiki/Pareidolia
+influence by Geoface Porject, looking for Face-like structures on google maps
+Face detection with Haar-like features, OpenCV-Python bindings
+Lots of false positives - still "Face on Moon South Pole" is found
+Create candies out of these alien shapes with 3D printing
+Other Discoveries
+LibCCV(Surf-based)
+Simple Algorithm is better so more "Alien-like objects" are found, meanwhile there is more false positives
+
+Marsobject detector
+Deep learning
+Inspired in a Kaggle competition - Create an algo to distinguish dogs from cats
+98.5% accuracy, top competitors are all using deep learning
+ImageNet Large Scale Visual Recognition Challenge 2012
+Winner is SuperVision which use Convolutional Neural Networks (CNNs)
+Input: Image, Output: Category(e.g. Cat)
+Deep learning Frameworks
+used Caffe. Built on C++, python binding
+Some scenario with bad results - Deep Learning cannot understand where the cat is, which is also relatively small
+Solution adapted in this project
+Sliding Window
+too many window is expensive
+Selective Search
+"more clever" as more interested region are proposed
+R-CNN (Regions with Convolutional Neural Network Features)
+grouping picture with different scales
+Selective Search is in MATLAB, CNN in C++, python is good to glue them together
+Golf ball issues
+Improvements needed: segmentation techniques, object recognition using IBM watson, crowdsourcing for screening(oDesk)...
+
+
+Future Work
+improved segmentation technique
+Object recognition by IBM Watson
+Crowdsourcing as screening tool(oDesk)
+interesting applications
+
+Project Giant Reap
+Space x Oriental Medicine!
+
+
+
+
+[15:10][R0]How to build a recommendation system with python
+A Matching System:
+User has each ranks for each items.
+Item-listing System:
+enumeration
+hierarchical model
+The history of matching system:
+hierarchical navigation - yahoo
+searching - google
+recommendation - spotify, netflix
+About searching skills
+Tree search < graph search < human search
+About know how
+Business know how < User know how
+
+Architecture of System:
+Platform
+e commerce, news, etc...
+Tracking & responding System
+HA Database
+Load Balancer
+Recommendation Engine
+Data Pipeline
+Machine learning models
+results API
+
+Simple Recommendation Engines:
+newest & hottest
+sorting
+content-based relations
+clustering methods
+k-means
+spectral clustering with scikit-learn
+tagging & searching
+pagerank
+collaborative filtering
+matrix completion
+difficult to optimize parameters
+matrix factorization
+svd(single value decomposition)
+problem: user-item matrix too sparse
+in reality: use keywords instead of the whole news itself
+boosting models: combine a set of weaker models to create a strong one
+ensemble models 
+c3h3@agilelearning.io
+
+
+[15:10][R1] 以雲端語音合成技術為基礎的音文同步有聲書之建立系統
+
+龜作圖推廣。
+
+
+
+[15:50][R1] ceph 介紹
+
+Storage System
+
+Feature:
+Replication 
+High capacity
+Consistency 
+Optional feature:
+Over Allocation
+Snapshot
+
+Storage 的演進:
+  # 圖例解說。
+  pass
+  
+What's Next?
+storage cluster:
+capacity 
+performance
+
+
+Ceph
+One of clustered storage
+Software defined storage
+Cost-performance tradeoff
+Flexible interfaces
+
+
+
+
+
+
+[15:50][R2] For Physics in Blender (or, what light looks like)
+`dir()` helps python learners to familiarize with Python
+
+
+
